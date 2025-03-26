@@ -37,31 +37,32 @@ const Countdown: React.FC<CountdownProps> = ({ days: initialDays, hours: initial
   
   return (
     <div className="flex space-x-4">
-      <div className="flex flex-col items-center">
-        <div className="bg-white rounded-md px-4 py-2 text-center w-20">
-          <span className="text-2xl font-bold">{days.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-xs mt-1">Days</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="bg-white rounded-md px-4 py-2 text-center w-20">
-          <span className="text-2xl font-bold">{hours.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-xs mt-1">Hours</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="bg-white rounded-md px-4 py-2 text-center w-20">
-          <span className="text-2xl font-bold">{minutes.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-xs mt-1">Minutes</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="bg-white rounded-md px-4 py-2 text-center w-20">
-          <span className="text-2xl font-bold">{seconds.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-xs mt-1">Seconds</span>
-      </div>
+  <div className="flex flex-col items-center">
+    <div className="bg-white text-black rounded-full w-20 h-20 flex items-center justify-center">
+      <span className="text-xl font-bold">{days.toString().padStart(2, '0')}</span>
     </div>
+    <span className="text-xs mt-2 text-white">Days</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <div className="bg-white text-black rounded-full w-20 h-20 flex items-center justify-center">
+      <span className="text-xl font-bold">{hours.toString().padStart(2, '0')}</span>
+    </div>
+    <span className="text-xs mt-2 text-white">Hours</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <div className="bg-white text-black rounded-full w-20 h-20 flex items-center justify-center">
+      <span className="text-xl font-bold">{minutes.toString().padStart(2, '0')}</span>
+    </div>
+    <span className="text-xs mt-2 text-white">Minutes</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <div className="bg-white text-black rounded-full w-20 h-20 flex items-center justify-center">
+      <span className="text-xl font-bold">{seconds.toString().padStart(2, '0')}</span>
+    </div>
+    <span className="text-xs mt-2 text-white">Seconds</span>
+  </div>
+</div>
+
   );
 };
 

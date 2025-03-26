@@ -8,9 +8,9 @@ const LoginPage = () => {
     <div className="container mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row">
         {/* Left side - Image */}
-        <div className="md:w-1/2 mb-8 md:mb-0">
+        <div className="md:w-1/2 mb-8 md:mb-0 ">
           <img 
-            src="/images/login-image.jpg" 
+            src="/images/Side Image.png" 
             alt="Shopping cart with smartphone" 
             className="w-full h-full object-cover"
           />

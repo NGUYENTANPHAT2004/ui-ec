@@ -33,7 +33,7 @@ type Product = {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Product Image Container */}
-      <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square">
+      <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square ">
         {/* Discount Badge */}
         {discount && (
           <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded z-10">
@@ -62,7 +62,7 @@ type Product = {
         <img 
           src={image} 
           alt={name} 
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-cover transition-transform duration-300 group-hover:scale-105"
         />
         
         {/* Add to Cart Button (shows on hover) */}

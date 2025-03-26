@@ -57,14 +57,16 @@ const Footer = () => {
             <div className="flex mb-4">
               <div className="w-24 h-24 bg-white p-1 mr-4">
                 {/* QR Code Placeholder */}
-                <div className="w-full h-full bg-gray-300"></div>
+                <div className="w-full h-full bg-gray-300">
+                <img src="/images/Qr Code.png" alt="Google Play" className="w-full h-full object-contain" />
+                </div>
               </div>
               <div className="flex flex-col justify-center space-y-2">
                 <a href="#" className="block">
-                  <img src="/path-to-google-play.png" alt="Google Play" className="h-8" />
+                  <img src="/images/GooglePlay.png" alt="Google Play" className="h-8" />
                 </a>
                 <a href="#" className="block">
-                  <img src="/path-to-app-store.png" alt="App Store" className="h-8" />
+                  <img src="/images/apple-logo.png" alt="App Store" className="h-8" />
                 </a>
               </div>
             </div>

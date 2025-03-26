@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
   const [features, setFeatures] = useState<FeatureType[]>([]);
   const [services, setServices] = useState<ServiceType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+  const [activeIndex, setActiveIndex] = useState(0);
   // This would normally be API calls
   useEffect(() => {
     // Simulating API fetch
@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
         { id: 'headphones', name: 'HeadPhones', icon: '/images/categories/headphone.png' },
         { id: 'gaming', name: 'Gaming', icon: '/images/categories/gaming.png' },
       ];
-      
+
       // Best selling products
       const sampleBestSellingProducts: Product[] = [
         {
@@ -89,7 +89,7 @@ const HomePage: React.FC = () => {
           ratingCount: 65,
         }
       ];
-      
+
       // Explore products
       const sampleExploreProducts: Product[] = [
         {
@@ -160,43 +160,47 @@ const HomePage: React.FC = () => {
           ratingCount: 55,
         }
       ];
-      
+
       // Featured sections data
       const sampleFeatures: FeatureType[] = [
         {
           id: 'playstation',
           title: 'PlayStation 5',
           description: 'Black and White version of the PS5 coming out on sale.',
-          image: '/images/features/ps5.jpg',
           buttonText: 'Shop Now',
-          link: '/category/gaming'
+          link: '#',
+          image:
+            '/images/playstation.png',
         },
         {
-          id: 'women-collection',
-          title: 'Women\'s Collections',
+          id: "women-collection",
+          title: "Women's Collections",
           description: 'Featured woman collections that give you another vibe.',
-          image: '/images/features/women.jpg',
           buttonText: 'Shop Now',
-          link: '/category/women'
+          link: '#',
+          image:
+            '/images/women.png',
         },
         {
           id: 'speakers',
-          title: 'Speakers',
-          description: 'Amazon wireless speakers',
-          image: '/images/features/speakers.jpg',
+          title: 'Smart Speaker',
+          description: 'Feel the quality of sound.',
           buttonText: 'Shop Now',
-          link: '/category/electronics'
+          link: '#',
+          image:
+            '/images/760.png',
         },
         {
           id: 'perfume',
           title: 'Perfume',
-          description: 'GUCCI INTENSE OUD EDP',
-          image: '/images/features/perfume.jpg',
+          description: 'Unique scent for everyone.',
           buttonText: 'Shop Now',
-          link: '/category/beauty'
-        }
+          link: '#',
+          image:
+            '/images/gucci.png',
+        },
       ];
-      
+
       // Services data
       const sampleServices: ServiceType[] = [
         {
@@ -218,7 +222,7 @@ const HomePage: React.FC = () => {
           icon: 'money-back-icon'
         }
       ];
-      
+
       setCategories(sampleCategories);
       setBestSellingProducts(sampleBestSellingProducts);
       setExploreProducts(sampleExploreProducts);
@@ -227,7 +231,7 @@ const HomePage: React.FC = () => {
       setLoading(false);
     }, 500);
   }, []);
-  
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
@@ -235,11 +239,11 @@ const HomePage: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
     <div>
       {/* Hero Banner */}
-      <div className="bg-black py-8 md:py-12">
+      <div className=" py-8 md:py-12 ">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row">
             {/* Left side - Categories */}
@@ -277,57 +281,99 @@ const HomePage: React.FC = () => {
                 </ul>
               </div>
             </div>
-            
+
             {/* Right side - Promo Banner */}
-            <div className="w-full md:w-3/4">
-              <div className="bg-gradient-to-r from-gray-900 to-black text-white rounded p-8 md:p-12 h-full flex flex-col justify-center">
-                <div className="max-w-lg">
-                  <div className="flex items-center mb-4">
-                    <img src="/images/apple-logo.png" alt="Apple Logo" className="h-10 mr-3" />
-                    <span className="text-lg">iPhone 14 Series</span>
-                  </div>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                    Up to 10% off Voucher
-                  </h1>
-                  <div className="flex space-x-2 items-center mb-6">
-                    <Link 
-                      to="/products/iphone" 
-                      className="flex items-center text-lg hover:underline"
-                    >
-                      <span>Shop Now</span>
-                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="/images/hero_endframe__cvklg0xk3w6e_large 2.png">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div className="w-full md:w-3/4 relative">
+  <div className="bg-gradient-to-r from-gray-900 to-black text-white rounded p-8 md:p-12 h-full flex flex-row items-center justify-between">
+    {/* Left content */}
+    <div className="max-w-lg">
+      <div className="flex items-center mb-4">
+        <img src="/images/apple-logo.png" alt="Apple Logo" className="h-10 mr-3" />
+        <span className="text-lg">iPhone 14 Series</span>
+      </div>
+      <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+        Up to 10% off Voucher
+      </h1>
+      <div className="flex space-x-2 items-center mb-6">
+        <Link
+          to="/products/iphone"
+          className="flex items-center text-lg font-medium hover:underline"
+        >
+          <span>Shop Now</span>
+          <svg
+            className="w-5 h-5 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </Link>
+      </div>
+    </div>
+
+    {/* Right image */}
+    <div className="hidden md:block">
+      <img
+        src="/images/hero_endframe__cvklg0xk3w6e_large 2.png"
+        alt="iPhone Banner"
+        className="max-w-xs md:max-w-sm lg:max-w-md object-contain"
+      />
+    </div>
+  </div>
+  <div className="flex justify-center absolute bottom-4 left-0 right-0 space-x-2">
+  {[0, 1, 2, 3, 4].map((index) => (
+    <button
+      key={index}
+      className={`w-2.5 h-2.5 rounded-full ${
+        index === activeIndex ? 'bg-white' : 'bg-gray-500'
+      }`}
+    />
+  ))}
+</div>
+
+</div>
+
           </div>
         </div>
       </div>
-      
+
       {/* Flash Sale & Time Counter */}
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-semibold mb-1">Enhance Your Music Experience</h2>
-            <div className="flex space-x-8 mt-4">
-              <Countdown days={5} hours={23} minutes={59} seconds={35} />
-            </div>
-          </div>
-          <div className="mt-4 md:mt-0">
-            <Link 
-              to="/flash-sale" 
-              className="inline-block px-8 py-3 bg-red-500 text-white rounded transition-colors hover:bg-red-600"
-            >
-              Buy Now!
-            </Link>
-          </div>
-        </div>
-        {/* <img src="/images/JBL_BOOMBOX_2_HERO_020_x1 (1) 1.png" alt="" /> */}
+  <div className="relative flex flex-col md:flex-row items-center justify-between bg-black text-white rounded-lg p-8 overflow-hidden">
+    {/* Text content */}
+    <div className="z-10 max-w-md">
+      <p className="text-green-500 text-sm mb-2">Categories</p>
+      <h2 className="text-3xl font-semibold leading-tight mb-6">
+        Enhance Your <br /> Music Experience
+      </h2>
+
+      {/* Countdown component */}
+      <div className="flex space-x-4 mb-6">
+      <Countdown days={5} hours={23} minutes={59} seconds={35} />
       </div>
-      
+
+      {/* Buy Now Button */}
+      <Link
+        to="/flash-sale"
+        className="inline-block px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition"
+      >
+        Buy Now!
+      </Link>
+    </div>
+
+    {/* Speaker Image */}
+    <div className="relative w-full md:w-1/2 h-64 md:h-auto flex items-center justify-center mt-10 md:mt-0">
+      <img
+        src="/images/JBL_BOOMBOX_2_HERO_020_x1 (1) 1.png" // update path if needed
+        alt="JBL Speaker"
+        className="max-w-full max-h-full object-contain"
+      />
+    </div>
+  </div>
+</div>
+
+
       {/* Categories Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -357,7 +403,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Best Selling Products */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -367,8 +413,8 @@ const HomePage: React.FC = () => {
           </div>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Best Selling Products</h2>
-            <Link 
-              to="/best-selling" 
+            <Link
+              to="/best-selling"
               className="inline-block px-6 py-2 bg-red-500 text-white rounded transition-colors hover:bg-red-600"
             >
               View All
@@ -381,7 +427,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Our Products Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -410,8 +456,8 @@ const HomePage: React.FC = () => {
             ))}
           </div>
           <div className="text-center mt-10">
-            <Link 
-              to="/products" 
+            <Link
+              to="/products"
               className="inline-block px-8 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
             >
               View All Products
@@ -419,47 +465,107 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      {/* Featured Section */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center mb-6">
-            <div className="w-5 h-10 bg-red-500 mr-3"></div>
-            <h2 className="text-lg">Featured</h2>
+{/*future*/}
+<div className="container mx-auto px-4 py-8">
+  {/* Header */}
+  <div className="mb-8">
+    <div className="flex items-center mb-6">
+      <div className="w-5 h-10 bg-red-500 mr-3"></div>
+      <h2 className="text-lg">Featured</h2>
+    </div>
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-semibold">New Arrival</h2>
+    </div>
+  </div>
+
+  {/* Main Content */}
+  <div className="flex flex-col lg:flex-row gap-6">
+    {/* PlayStation - bên trái */}
+    <div className="relative bg-black text-white rounded overflow-hidden flex-1 min-h-[620px]">
+      <img
+        src={features[0].image}
+        alt={features[0].title}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inset-0  object-cover"
+      />
+      <div className="absolute bottom-6 left-6 z-10 max-w-[80%]">
+        <div>
+          <h3 className="text-2xl font-bold mb-2">{features[0].title}</h3>
+          <p className="text-gray-200 text-sm">{features[0].description}</p>
+        </div>
+        <Link
+          to={features[0].link}
+          className="inline-flex items-center mt-4 text-white hover:underline"
+        >
+          {features[0].buttonText}
+          <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </Link>
+      </div>
+    </div>
+
+    {/* Khối bên phải: 1 hàng trên + 2 ô dưới */}
+    <div className="flex flex-col gap-6 flex-1">
+      {/* Ô trên: Women's Collection */}
+      <div className="relative bg-black text-white rounded overflow-hidden h-[300px]">
+        <img
+          src={features[1].image}
+          alt={features[1].title}
+          className=" inset-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-cover"
+        />
+        <div className="absolute bottom-6 left-6 z-10 max-w-[80%]">
+          <div>
+            <h3 className="text-2xl font-bold mb-2">{features[1].title}</h3>
+            <p className="text-gray-200 text-sm">{features[1].description}</p>
           </div>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">New Arrival</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <div 
-                key={feature.id} 
-                className={`bg-black text-white rounded overflow-hidden ${
-                  index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''
-                }`}
-              >
-                <div className="p-6 flex flex-col h-full justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-gray-300 mb-4">{feature.description}</p>
-                  </div>
-                  <Link 
-                    to={feature.link} 
-                    className="inline-flex items-center text-white hover:underline"
-                  >
-                    {feature.buttonText}
-                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Link
+            to={features[1].link}
+            className="inline-flex items-center mt-4 text-white hover:underline"
+          >
+            {features[1].buttonText}
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </Link>
         </div>
       </div>
-      
+
+      {/* 2 ô nhỏ dưới: grid 2 cột */}
+      <div className="grid grid-cols-2 gap-6">
+        {[features[2], features[3]].map((feature) => (
+          <div
+            key={feature.id}
+            className="relative bg-black text-white rounded overflow-hidden h-[300px]"
+          >
+            <img
+              src={feature.image}
+              alt={feature.title}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inset-0  object-cover"
+            />
+            <div className="absolute bottom-6 left-6 z-10 max-w-[80%]">
+              <div>
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-gray-200 text-sm">{feature.description}</p>
+              </div>
+              <Link
+                to={feature.link}
+                className="inline-flex items-center mt-4 text-white hover:underline"
+              >
+                {feature.buttonText}
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
       {/* Services Section */}
       <div className="container mx-auto px-4 py-16 border-t border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
