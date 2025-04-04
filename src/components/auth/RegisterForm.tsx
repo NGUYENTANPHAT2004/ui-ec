@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// LoginForm.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { authService } from '../../services/api';
+import { AxiosError } from 'axios';
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,17 +26,26 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await authService.login(formData);
-      if (response.user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      const registerData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      };
+      await authService.register(registerData);
+      navigate('/');
+    } catch (err) {
+      const error = err as AxiosError<{ error: string }>;
+      setError(error.response?.data?.error || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -43,29 +53,42 @@ const LoginForm = () => {
   
   return (
     <div className="max-w-md mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-2 text-center">Log in to Exclusive</h1>
+      <h1 className="text-3xl font-bold mb-2 text-center">Create Account</h1>
       <p className="text-gray-600 mb-6 text-center">Enter your details below</p>
-  
+    
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
           {error}
         </div>
       )}
-  
+
       <form onSubmit={handleSubmit}>
+        {/* Name Input */}
+        <div className="mb-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border-b border-gray-300 focus:border-gray-800 focus:outline-none transition-colors"
+            required
+          />
+        </div>
+
         {/* Email Input */}
         <div className="mb-4">
           <input
             type="email"
             name="email"
-            placeholder="Email or Phone Number"
+            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
             className="w-full px-4 py-3 border-b border-gray-300 focus:border-gray-800 focus:outline-none transition-colors"
             required
           />
         </div>
-  
+    
         {/* Password Input */}
         <div className="mb-4">
           <input
@@ -78,31 +101,37 @@ const LoginForm = () => {
             required
           />
         </div>
-  
-        {/* Submit + Forgot */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mt-6">
+
+        {/* Confirm Password Input */}
+        <div className="mb-4">
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border-b border-gray-300 focus:border-gray-800 focus:outline-none transition-colors"
+            required
+          />
+        </div>
+    
+        {/* Submit Button */}
+        <div className="mt-6">
           <Button 
             type="submit" 
             variant="primary" 
-            className="w-full sm:w-auto"
+            className="w-full"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Registering...' : 'Register'}
           </Button>
-  
-          <Link
-            to="/forgot-password"
-            className="text-red-500 text-sm hover:underline text-center sm:text-right"
-          >
-            Forgot Password?
-          </Link>
         </div>
 
-        {/* Register Link */}
+        {/* Login Link */}
         <p className="text-center mt-4 text-sm">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-red-500 hover:underline">
-            Register
+          Already have an account?{' '}
+          <Link to="/login" className="text-red-500 hover:underline">
+            Login
           </Link>
         </p>
       </form>
@@ -110,4 +139,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm; 

@@ -1,6 +1,7 @@
 // Product types
 export interface Product {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID from backend
   name: string;
   price: number;
   originalPrice?: number;
@@ -15,18 +16,22 @@ export interface Product {
   inStock?: boolean;
   colors?: Array<{ name: string; value: string }>;
   sizes?: string[];
-  category?: string;
+  // Support both string ID and Category object from populated queries
+  category?: string | Category | { _id: string; name: string };
   tags?: string[];
   sku?: string;
   brand?: string;
+  createdAt?: string | Date;
 }
 
 // Category types
 export interface Category {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID from backend
   name: string;
-  icon: string;
+  icon?: string;
   subcategories?: Category[];
+  createdAt?: string | Date;
 }
 
 // Feature types
@@ -49,16 +54,25 @@ export interface Service {
 
 // User types
 export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
+  id?: string;
+  _id?: string; // MongoDB ID from backend
+  name: string;
   email: string;
+  role?: 'user' | 'admin';
   avatar?: string;
+  createdAt?: string | Date;
+}
+
+// JWT Authentication Response
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 // Order types
 export interface Order {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID from backend
   userId: string;
   products: Array<{
     productId: string;
@@ -69,7 +83,7 @@ export interface Order {
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: Address;
   paymentMethod: string;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 // Address types
@@ -79,4 +93,17 @@ export interface Address {
   state: string;
   postalCode: string;
   country: string;
+}
+
+// API Response types
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+// Error Response type
+export interface ErrorResponse {
+  error: string;
+  status?: number;
 }
