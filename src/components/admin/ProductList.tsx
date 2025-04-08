@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { productService, categoryService } from '../../services/api';
 import { Product } from '../../interface/product';
+import Modal from '../common/Modal';
+import ProductForm from './ProductForm';
 
 interface Category {
   _id: string;
@@ -17,7 +20,11 @@ const ProductList: React.FC = () => {
     category: ''
   });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
@@ -26,11 +33,15 @@ const ProductList: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const response = await productService.getAll();
       setProducts(response.data);
-    } catch (error) {
+      setError(null);
+    } catch (err) {
       setError('Failed to fetch products');
-      console.error(error);
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -113,156 +124,141 @@ const ProductList: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await productService.delete(id);
-      setProducts(products.filter(prod => (prod._id !== id && prod.id !== id)));
-    } catch (error) {
-      setError('Failed to delete product');
-      console.error(error);
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await productService.delete(id);
+        setProducts(products.filter(product => product._id !== id));
+      } catch (err) {
+        setError('Failed to delete product');
+        console.error('Error deleting product:', err);
+      }
     }
   };
 
-  return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Products</h2>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+  const handleEdit = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
 
-      {/* Create Product Form */}
-      <form onSubmit={handleCreate} className="mb-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            value={newProduct.name}
-            onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-            placeholder="Product name"
-            className="p-2 border rounded"
-          />
-          <input
-            type="number"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-            placeholder="Price"
-            className="p-2 border rounded"
-          />
-          <input
-            type="text"
-            value={newProduct.image}
-            onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
-            placeholder="Image URL"
-            className="p-2 border rounded"
-          />
-          <select
-            value={newProduct.category}
-            onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-            className="p-2 border rounded"
-          >
-            <option value="">Select Category</option>
-            {categories.map(category => (
-              <option key={category._id} value={category._id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleFormSubmit = async (formData: FormData) => {
+    try {
+      if (selectedProduct) {
+        await productService.update(selectedProduct._id, formData);
+      } else {
+        await productService.create(formData);
+      }
+      fetchProducts();
+      handleModalClose();
+    } catch (err) {
+      setError('Failed to save product');
+      console.error('Error saving product:', err);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Product Management</h1>
         <button
-          type="submit"
+          onClick={() => setIsModalOpen(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Add Product
         </button>
-      </form>
-
-      {/* Products List */}
-      <div className="space-y-4">
-        {products.map(product => {
-          const productId = product._id || product.id;
-          return (
-            <div key={productId} className="border rounded p-4">
-              {editingProduct && (editingProduct._id === productId || editingProduct.id === productId) ? (
-                <form onSubmit={handleUpdate} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      value={editingProduct.name}
-                      onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
-                      className="p-2 border rounded"
-                    />
-                    <input
-                      type="number"
-                      value={editingProduct.price}
-                      onChange={(e) => setEditingProduct({...editingProduct, price: Number(e.target.value)})}
-                      className="p-2 border rounded"
-                    />
-                    <input
-                      type="text"
-                      value={editingProduct.image}
-                      onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
-                      className="p-2 border rounded"
-                    />
-                    <select
-                      value={editingProduct.category?._id || editingProduct.category}
-                      onChange={(e) => setEditingProduct({
-                        ...editingProduct,
-                        category: categories.find(cat => cat._id === e.target.value) || e.target.value
-                      })}
-                      className="p-2 border rounded"
-                    >
-                      {categories.map(category => (
-                        <option key={category._id} value={category._id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="submit"
-                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingProduct(null)}
-                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="font-bold">{product.name}</div>
-                    <div>Price: ${product.price}</div>
-                    <div>Category: {product.category?.name || 'Uncategorized'}</div>
-                    <img src={product.image} alt={product.name} className="w-20 h-20 object-cover mt-2" />
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditingProduct(product)}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(productId)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
       </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Price
+              </th>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Category
+              </th>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Stock
+              </th>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id}>
+                <td className="px-6 py-4 border-b border-gray-200">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <img
+                        className="h-10 w-10 rounded-full object-cover"
+                        src={product.image}
+                        alt={product.name}
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200">
+                  <div className="text-sm text-gray-900">${product.price}</div>
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200">
+                  <div className="text-sm text-gray-900">
+                    {typeof product.category === 'object' ? product.category.name : product.category}
+                  </div>
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200">
+                  <div className="text-sm text-gray-900">{product.countInStock}</div>
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200">
+                  <button
+                    onClick={() => handleEdit(product)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-3"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product._id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        title={selectedProduct ? 'Edit Product' : 'Add New Product'}
+      >
+        <ProductForm
+          initialData={selectedProduct}
+          onSubmit={handleFormSubmit}
+        />
+      </Modal>
     </div>
   );
 };

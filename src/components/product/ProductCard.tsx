@@ -1,30 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-type Product = {
-    id: string;
-    name: string;
-    price: number;
-    originalPrice?: number;
-    image: string;
-    images?: string[];
-    discount?: number;
-    isNew?: boolean;
-    rating?: number;
-    ratingCount?: number;
-    description?: string;
-    colors?: { name: string; value: string }[];
-    sizes?: string[];
-    inStock?: boolean;
-    reviewCount?: number;
-    totalUsers?: number;
-  };
-  interface ProductCardProps {
-    product: Product;
-  }
-  const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+import { Product } from '../../interface/product';
+
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  const { id, name, price, originalPrice, image, discount, isNew, rating, ratingCount } = product;
+  const { _id, id, name, price, originalPrice, image, discount, isNew, rating, ratingCount } = product;
+  const productId = _id || id;
   
   return (
     <div 
@@ -77,7 +63,7 @@ type Product = {
       
       {/* Product Details */}
       <div className="mt-3">
-        <Link to={`/product/${id}`} className="block">
+        <Link to={`/product/${productId}`} className="block">
           <h3 className="text-sm font-medium hover:text-red-500 transition-colors">{name}</h3>
         </Link>
         <div className="mt-1 flex items-baseline">
@@ -103,7 +89,9 @@ type Product = {
                 </svg>
               ))}
             </div>
-            {ratingCount && <span className="text-xs text-gray-500 ml-1">({ratingCount})</span>}
+            {ratingCount && (
+              <span className="text-gray-500 text-xs ml-1">({ratingCount})</span>
+            )}
           </div>
         )}
       </div>

@@ -33,7 +33,7 @@ api.interceptors.response.use(
 );
 
 // Helper to transform backend product to frontend format
-const transformProduct = (product: any): Product => {
+const transformProduct = (product: Product): Product => {
   if (!product) return {} as Product;
   
   return {
@@ -41,23 +41,26 @@ const transformProduct = (product: any): Product => {
     _id: product._id,
     name: product.name,
     price: product.price,
-    image: product.image,
+    image: product.image || '', // Thêm giá trị mặc định
+    images: product.images || [product.image], // Đảm bảo mảng images luôn tồn tại
     category: product.category,
-    description: product.description,
-    // Add any other fields that need transformation
+    description: product.description || '',
     createdAt: product.createdAt,
+    discount: product.discount || 0,
+    originalPrice: product.originalPrice || 0,
+    rating: product.rating || 0,
+    ratingCount: product.ratingCount || 0,
+    tags: product.tags || []
   };
 };
-
 // Helper to transform backend category to frontend format
-const transformCategory = (category: any): Category => {
+const transformCategory = (category: Category): Category => {
   if (!category) return {} as Category;
   
   return {
     id: category._id,
     _id: category._id,
     name: category.name,
-    // Map any other fields
     createdAt: category.createdAt,
   };
 };
@@ -128,156 +131,90 @@ export const authService = {
 
 export const categoryService = {
   getAll: async (): Promise<AxiosResponse<Category[]>> => {
-    try {
-      const response = await api.get<Category[]>('/categories');
-      // Transform backend data to frontend format if needed
-      response.data = response.data.map(transformCategory);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Category[]>('/categories');
+    response.data = response.data.map(transformCategory);
+    return response;
   },
   
   getById: async (id: string): Promise<Category> => {
-    try {
-      const response = await api.get<Category>(`/categories/${id}`);
-      return transformCategory(response.data);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Category>(`/categories/${id}`);
+    return transformCategory(response.data);
   },
   
   create: async (data: { name: string }): Promise<AxiosResponse<Category>> => {
-    try {
-      const response = await api.post<Category>('/categories', data);
-      response.data = transformCategory(response.data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post<Category>('/categories', data);
+    response.data = transformCategory(response.data);
+    return response;
   },
   
   update: async (id: string, data: { name: string }): Promise<AxiosResponse<Category>> => {
-    try {
-      const response = await api.put<Category>(`/categories/${id}`, data);
-      response.data = transformCategory(response.data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.put<Category>(`/categories/${id}`, data);
+    response.data = transformCategory(response.data);
+    return response;
   },
   
   delete: async (id: string): Promise<void> => {
-    try {
-      await api.delete(`/categories/${id}`);
-    } catch (error) {
-      throw error;
-    }
+    await api.delete(`/categories/${id}`);
   }
 };
 
 export const productService = {
   getAll: async (): Promise<AxiosResponse<Product[]>> => {
-    try {
-      const response = await api.get<Product[]>('/products');
-      // Transform the data to match frontend expectations
-      response.data = response.data.map(transformProduct);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Product[]>('/products');
+    response.data = response.data.map(transformProduct);
+    return response;
   },
   
-  getById: async (id: string): Promise<Product> => {
-    try {
-      const response = await api.get<Product>(`/products/${id}`);
-      return transformProduct(response.data);
-    } catch (error) {
-      throw error;
-    }
+  getById: async (id: string): Promise<AxiosResponse<Product>> => {
+    const response = await api.get<Product>(`/products/${id}`);
+    response.data = transformProduct(response.data);
+    return response;
   },
   
-  create: async (data: { 
-    name: string; 
-    price: number; 
-    image: string; 
-    category: string;
-    description?: string;
-  }): Promise<AxiosResponse<Product>> => {
-    try {
-      const response = await api.post<Product>('/products', data);
-      response.data = transformProduct(response.data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  create: async (formData: FormData): Promise<AxiosResponse<Product>> => {
+    const response = await api.post<Product>('/products', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    response.data = transformProduct(response.data);
+    return response;
   },
   
-  update: async (id: string, data: { 
-    name: string; 
-    price: number; 
-    image: string; 
-    category: string;
-    description?: string;
-  }): Promise<AxiosResponse<Product>> => {
-    try {
-      const response = await api.put<Product>(`/products/${id}`, data);
-      response.data = transformProduct(response.data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  update: async (id: string, formData: FormData): Promise<AxiosResponse<Product>> => {
+    const response = await api.put<Product>(`/products/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    response.data = transformProduct(response.data);
+    return response;
   },
   
   delete: async (id: string): Promise<void> => {
-    try {
-      await api.delete(`/products/${id}`);
-    } catch (error) {
-      throw error;
-    }
+    await api.delete(`/products/${id}`);
   },
   
-  // Add any additional methods needed for your frontend
   getByCategoryId: async (categoryId: string): Promise<Product[]> => {
-    try {
-      const response = await api.get<Product[]>(`/products/category/${categoryId}`);
-      return response.data.map(transformProduct);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Product[]>(`/products/category/${categoryId}`);
+    return response.data.map(transformProduct);
   },
   
   getBestSellers: async (): Promise<Product[]> => {
-    // This would need to be implemented on the backend
-    // For now, we'll just get all products as a placeholder
-    try {
-      const response = await api.get<Product[]>('/products');
-      return response.data.map(transformProduct);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Product[]>('/products');
+    return response.data.map(transformProduct);
   },
   
   getNewArrivals: async (): Promise<Product[]> => {
-    // This would need to be implemented on the backend
-    // For now, we'll just get all products as a placeholder
-    try {
-      const response = await api.get<Product[]>('/products');
-      return response.data.map(transformProduct);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get<Product[]>('/products');
+    return response.data.map(transformProduct);
   }
 };
 
 export const adminService = {
   getDashboardData: async () => {
-    try {
-      const response = await api.get('/admin/dashboard');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get('/admin/dashboard');
+    return response.data;
   }
 };
 

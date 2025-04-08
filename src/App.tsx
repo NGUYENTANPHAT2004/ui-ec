@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import TopBanner from './components/common/TopBanner';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -7,10 +7,18 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminPage from './pages/AdminPage';
-import ProductPage from './pages/ProductPage';
 import CategoryPage from './pages/CategoryPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import ProductDetail from './components/product/ProductDetail';
+import { productService } from './services/api';
+import { Product } from './interface/product';
+import ProductDetailPage from './components/product/Productdetailpage';
+import SearchPage from './pages/SearchPage';
+
+// ProductDetailPage component to fetch product data
+
+ 
 
 const App: React.FC = () => {
   return (
@@ -31,8 +39,10 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/product/:id" element={<ProductPage />} />
-            <Route path="/category/:categoryName" element={<CategoryPage />} />
+            {/* <Route path="/product/:id" element={<ProductPage />} /> */}
+            <Route path="/category/:categoryId" element={<CategoryPage />} />
+            <Route path="/product/:productId" element={<ProductDetailPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

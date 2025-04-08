@@ -11,19 +11,42 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Product price is required'],
     min: [1000, 'Price must be greater than 1000']
   },
+  description: {
+    type: String,
+    required: true,
+    trim: true
+  },
   image: {
     type: String,
     required: [true, 'Product image is required']
   },
+  images: [{
+    type: String
+  }],
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
-    required: [true, 'Category is required']
+    required: [true, 'Product category is required']
+  },
+  countInStock: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  rating: {
+    type: Number,
+    default: 0
+  },
+  numReviews: {
+    type: Number,
+    default: 0
   },
   createdAt: {
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
 // Check if the model already exists
