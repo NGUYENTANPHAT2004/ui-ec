@@ -37,7 +37,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, isEdit = false, 
   const [errors, setErrors] = useState<FormErrors>({});
   const [image, setImage] = useState<File | null>(null);
   const [images, setImages] = useState<File[]>([]);
-  const [previewImage, setPreviewImage] = useState(initialData?.image || '');
+  const [previewImage, setPreviewImage] = useState<string>(initialData?.image || '');
   const [previewImages, setPreviewImages] = useState<string[]>(initialData?.images || []);
 
   useEffect(() => {
@@ -53,6 +53,20 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, isEdit = false, 
 
     fetchCategories();
   }, []);
+
+  // Cleanup preview URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
+      previewImages.forEach((url: string) => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [previewImage, previewImages]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -90,13 +104,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, isEdit = false, 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: FormDataState) => ({
       ...prev,
       [name]: value
     }));
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev: FormErrors) => ({
         ...prev,
         [name]: undefined
       }));
@@ -106,16 +120,59 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, isEdit = false, 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Only JPEG, PNG, JPG and WebP images are allowed');
+        return;
+      }
+
+      // Cleanup old preview URL
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
+
       setImage(file);
       setPreviewImage(URL.createObjectURL(file));
+      setError(null);
     }
   };
 
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
+      
+      // Validate each file
+      for (const file of files) {
+        if (file.size > 5 * 1024 * 1024) {
+          setError('Each image must be less than 5MB');
+          return;
+        }
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+          setError('Only JPEG, PNG, JPG and WebP images are allowed');
+          return;
+        }
+      }
+
+      // Cleanup old preview URLs
+      previewImages.forEach((url: string) => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+
       setImages(files);
       setPreviewImages(files.map(file => URL.createObjectURL(file)));
+      setError(null);
     }
   };
 
@@ -123,6 +180,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, isEdit = false, 
     e.preventDefault();
     
     if (!validateForm()) {
+      return;
+    }
+
+    // Validate that at least one image is uploaded for new products
+    if (!isEdit && !image && images.length === 0) {
+      setError('At least one image is required');
       return;
     }
 

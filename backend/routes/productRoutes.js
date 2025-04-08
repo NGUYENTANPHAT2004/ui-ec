@@ -3,14 +3,36 @@ const router = express.Router();
 const Product = require('../models/Product');
 const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
-const upload = require('../middleware/upload');
+const { upload, handleUploadError } = require('../middleware/upload');
 const path = require('path');
+
+// Helper function to get full image URL
+const getFullImageUrl = (filename) => {
+  if (!filename) return '';
+  // Check if the filename already has a full URL
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  // Add the server URL to the image path
+  return `http://localhost:5000/uploads/${filename}`;
+};
 
 // Get all products with category details
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find().populate('category', 'name');
-    res.json(products);
+    // Transform image paths to include full URL
+    const transformedProducts = products.map(product => {
+      const productObj = product.toObject();
+      if (productObj.image) {
+        productObj.image = getFullImageUrl(productObj.image);
+      }
+      if (productObj.images && productObj.images.length > 0) {
+        productObj.images = productObj.images.map(img => getFullImageUrl(img));
+      }
+      return productObj;
+    });
+    res.json(transformedProducts);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch products' });
   }
@@ -33,7 +55,17 @@ router.get('/:id', async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json(product);
+    
+    // Transform image paths to include full URL
+    const productObj = product.toObject();
+    if (productObj.image) {
+      productObj.image = getFullImageUrl(productObj.image);
+    }
+    if (productObj.images && productObj.images.length > 0) {
+      productObj.images = productObj.images.map(img => getFullImageUrl(img));
+    }
+    
+    res.json(productObj);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
   }
@@ -43,7 +75,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, adminAuth, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'images', maxCount: 5 }
-]), async (req, res) => {
+]), handleUploadError, async (req, res) => {
   try {
     const { name, description, price, category, countInStock } = req.body;
     
@@ -62,7 +94,17 @@ router.post('/', auth, adminAuth, upload.fields([
     });
 
     await product.save();
-    res.status(201).json(product);
+    
+    // Transform response to include full image URLs
+    const productObj = product.toObject();
+    if (productObj.image) {
+      productObj.image = getFullImageUrl(productObj.image);
+    }
+    if (productObj.images && productObj.images.length > 0) {
+      productObj.images = productObj.images.map(img => getFullImageUrl(img));
+    }
+    
+    res.status(201).json(productObj);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -72,7 +114,7 @@ router.post('/', auth, adminAuth, upload.fields([
 router.put('/:id', auth, adminAuth, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'images', maxCount: 5 }
-]), async (req, res) => {
+]), handleUploadError, async (req, res) => {
   try {
     const { name, description, price, category, countInStock } = req.body;
     
@@ -95,13 +137,22 @@ router.put('/:id', auth, adminAuth, upload.fields([
       req.params.id,
       updateData,
       { new: true }
-    );
+    ).populate('category', 'name');
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.json(product);
+    // Transform response to include full image URLs
+    const productObj = product.toObject();
+    if (productObj.image) {
+      productObj.image = getFullImageUrl(productObj.image);
+    }
+    if (productObj.images && productObj.images.length > 0) {
+      productObj.images = productObj.images.map(img => getFullImageUrl(img));
+    }
+
+    res.json(productObj);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

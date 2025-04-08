@@ -4,21 +4,33 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: 'http://localhost:5173', // Your React app URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
+app.use(cors());  // Allow all origins in development
 app.use(express.json());
 app.use(morgan('dev')); // Log requests
 
-// Serve static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve static files from uploads directory with proper MIME types
+app.use('/uploads', express.static(uploadsDir, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    } else if (filePath.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/webp');
+    }
+  }
+}));
 
 // MongoDB Connection
 console.log('Attempting to connect to MongoDB...');
