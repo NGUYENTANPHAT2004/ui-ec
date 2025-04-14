@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Product, Category, User, AuthResponse, ErrorResponse } from '../interface/product';
+import { Product, Category, User, AuthResponse, ErrorResponse, CartItem } from '../interface/product';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -211,6 +211,34 @@ export const productService = {
   }
 };
 
+// Add cartService implementation
+export const cartService = {
+  getCart: async (): Promise<AxiosResponse<CartItem[]>> => {
+    const response = await api.get('/cart');
+    return response;
+  },
+  
+  addToCart: async (productId: string, quantity: number = 1): Promise<AxiosResponse<CartItem[]>> => {
+    const response = await api.post('/cart', { productId, quantity });
+    return response;
+  },
+  
+  updateQuantity: async (productId: string, quantity: number): Promise<AxiosResponse<CartItem[]>> => {
+    const response = await api.put(`/cart/${productId}`, { quantity });
+    return response;
+  },
+  
+  removeItem: async (productId: string): Promise<AxiosResponse<CartItem[]>> => {
+    const response = await api.delete(`/cart/${productId}`);
+    return response;
+  },
+  
+  clearCart: async (): Promise<AxiosResponse<void>> => {
+    const response = await api.delete('/cart');
+    return response;
+  }
+};
+
 export const adminService = {
   getDashboardData: async () => {
     const response = await api.get('/admin/dashboard');
@@ -218,4 +246,61 @@ export const adminService = {
   }
 };
 
+// Add CustomerInfo interface
+interface CustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+export const paymentService = {
+  async createVNPayPayment(paymentData: {
+    amount: number;
+    customerInfo: CustomerInfo;
+    orderDescription: string;
+  }) {
+    const response = await axios.post(`${API_URL}/payments/create-vnpay`, {
+      ...paymentData,
+      returnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:5173/payment-return'
+    });
+    return response;
+  },
+};
+export const revenueService = {
+  // Keep existing methods
+  
+  getAdminRevenueStatistics: async (params: { timeRange: string }) => {
+    const response = await api.get('/admin/revenue', { params });
+    return response;
+  }
+};
+export const orderService = {
+  getUserOrders: async () => {
+    const response = await api.get('/orders');
+    return response;
+  },
+  
+  getOrderById: async (id: string) => {
+    const response = await api.get(`/orders/${id}`);
+    return response;
+  },
+  
+  getAllOrders: async () => {
+    const response = await api.get('/admin/orders');
+    return response;
+  },
+  
+  updateOrderStatus: async (orderId: string, status: string) => {
+    const response = await api.put(`/admin/orders/${orderId}/status`, { status });
+    return response;
+  },
+  
+  updatePaymentStatus: async (orderId: string, status: string) => {
+    const response = await api.put(`/admin/orders/${orderId}/payment-status`, { status });
+    return response;
+  }
+};
 export default api;
+// Add this to your existing revenueService object
+

@@ -15,10 +15,11 @@ import { productService } from './services/api';
 import { Product } from './interface/product';
 import ProductDetailPage from './components/product/Productdetailpage';
 import SearchPage from './pages/SearchPage';
-
-// ProductDetailPage component to fetch product data
-
- 
+import CartPage from './pages/CartPage';
+import PaymentSuccessPage from './pages/success';
+import PaymentReturnPage from './pages/PaymentReturnPage';
+import PaymentFailedPage from './pages/failed';
+import CheckoutPage from './pages/CheckoutPage';
 
 const App: React.FC = () => {
   return (
@@ -39,10 +40,14 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            {/* <Route path="/product/:id" element={<ProductPage />} /> */}
             <Route path="/category/:categoryId" element={<CategoryPage />} />
+            <Route path="/payment-return" element={<PaymentReturnPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/payment-failed" element={<PaymentFailedPage />} />
             <Route path="/product/:productId" element={<ProductDetailPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

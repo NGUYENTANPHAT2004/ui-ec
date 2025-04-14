@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
 import CategoryList from '../components/admin/CategoryList';
 import ProductList from '../components/admin/ProductList';
+import RevenueStats from '../components/admin/RevenueStats';
+import OrderManagement from '../components/admin/ordermanager';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'categories' | 'products'>('categories');
+  const [activeTab, setActiveTab] = useState<'categories' | 'products' | 'statistics'| 'OrderManagement'> ('statistics');
 
   const handleLogout = () => {
     authService.logout();
@@ -33,6 +35,26 @@ const AdminPage: React.FC = () => {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button
+              onClick={() => setActiveTab('statistics')}
+              className={`${
+                activeTab === 'statistics'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Statistics
+            </button>
+            <button
+              onClick={() => setActiveTab('OrderManagement')}
+              className={`${
+                activeTab === 'OrderManagement'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              order
+            </button>
+            <button
               onClick={() => setActiveTab('categories')}
               className={`${
                 activeTab === 'categories'
@@ -58,10 +80,13 @@ const AdminPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {activeTab === 'categories' ? <CategoryList /> : <ProductList />}
+        {activeTab === 'categories' && <CategoryList />}
+        {activeTab === 'products' && <ProductList />}
+        {activeTab === 'statistics' && <RevenueStats />}
+        {activeTab === 'OrderManagement' && <OrderManagement />}
       </main>
     </div>
   );
 };
 
-export default AdminPage; 
+export default AdminPage;

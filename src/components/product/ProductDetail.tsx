@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Product } from '../../interface/product';
+import { cartService } from '../../services/api';
 
 interface ProductDetailProps {
   product: Product;
@@ -8,6 +10,9 @@ interface ProductDetailProps {
 const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
   const [selectedImage, setSelectedImage] = useState<string>(product.image);
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const images = product.images || [product.image];
 
@@ -21,8 +26,39 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
     }
   };
 
+  const handleAddToCart = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Get the product ID (either _id or id depending on your API)
+      const productId = product._id || product.id;
+      
+      if (!productId) {
+        throw new Error('Product ID is missing');
+      }
+      
+      // Call the API to add the product to cart
+      await cartService.addToCart(productId, quantity);
+      
+      // Navigate to cart page after successful addition
+      navigate('/cart');
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      setError('Failed to add product to cart. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Image Gallery */}
         <div className="space-y-4">
@@ -118,6 +154,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
               <button
                 className="px-3 py-2 hover:bg-gray-100"
                 onClick={() => handleQuantityChange(quantity - 1)}
+                disabled={loading}
               >
                 -
               </button>
@@ -125,12 +162,27 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
               <button
                 className="px-3 py-2 hover:bg-gray-100"
                 onClick={() => handleQuantityChange(quantity + 1)}
+                disabled={loading}
               >
                 +
               </button>
             </div>
-            <button className="flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-              Add to Cart
+            <button 
+              className={`flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 flex items-center justify-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              onClick={handleAddToCart}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding...
+                </>
+              ) : (
+                'Add to Cart'
+              )}
             </button>
           </div>
 

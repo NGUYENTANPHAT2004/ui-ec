@@ -2,6 +2,7 @@
 
 export interface Product {
   _id: string;
+  id?: string; // Added for frontend compatibility
   name: string;
   description: string;
   price: number;
@@ -13,10 +14,15 @@ export interface Product {
   numReviews: number;
   createdAt: string;
   updatedAt: string;
+  discount?: number;
+  originalPrice?: number;
+  ratingCount?: number;
+  tags?: string[];
 }
 
 export interface Category {
   _id: string;
+  id?: string; // Added for frontend compatibility
   name: string;
   createdAt: string;
   updatedAt: string;
@@ -38,4 +44,47 @@ export interface AuthResponse {
 
 export interface ErrorResponse {
   error: string;
+}
+
+// Cart related interfaces
+export interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  onSale?: {
+    discountedPrice: number;
+    discountPercentage: number;
+  };
+}
+
+export interface CustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+export interface Order {
+  _id: string;
+  userId: string;
+  items: CartItem[];
+  total: number;
+  customerInfo: CustomerInfo;
+  paymentMethod: string;
+  paymentStatus: string;
+  orderStatus: string;
+  transactionId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RevenueData {
+  date: string;
+  total: number;
+  vnpay: number;
+  cod: number;
+  completed: number;
+  pending: number;
 }

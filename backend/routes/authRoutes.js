@@ -111,5 +111,14 @@ router.get('/me', auth, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
 });
+router.get('/getalluser', async (req, res) => {
+  try {
+    // User data is already attached from auth middleware
+    const user = await User.find({}).lean()
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+});
 
 module.exports = router;
