@@ -7,10 +7,16 @@ const categorySchema = new mongoose.Schema({
     trim: true,
     unique: true
   },
+  image: {
+    type: String,
+    default: ''
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
 // Check if the model already exists

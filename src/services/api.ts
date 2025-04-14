@@ -33,37 +33,35 @@ api.interceptors.response.use(
 );
 
 // Helper to transform backend product to frontend format
-const transformProduct = (product: Product): Product => {
-  if (!product) return {} as Product;
-  
-  return {
-    id: product._id,
-    _id: product._id,
-    name: product.name,
-    price: product.price,
-    image: product.image || '', // Thêm giá trị mặc định
-    images: product.images || [product.image], // Đảm bảo mảng images luôn tồn tại
-    category: product.category,
-    description: product.description || '',
-    createdAt: product.createdAt,
-    discount: product.discount || 0,
-    originalPrice: product.originalPrice || 0,
-    rating: product.rating || 0,
-    ratingCount: product.ratingCount || 0,
-    tags: product.tags || []
-  };
-};
+const transformProduct = (product: any): Product => ({
+  id: product._id,
+  _id: product._id,
+  name: product.name,
+  price: product.price,
+  image: product.image,
+  images: product.images,
+  category: product.category,
+  description: product.description,
+  createdAt: product.createdAt,
+  discount: product.discount,
+  originalPrice: product.originalPrice,
+  rating: product.rating,
+  ratingCount: product.ratingCount,
+  tags: product.tags,
+  countInStock: product.countInStock || 0,
+  numReviews: product.numReviews || 0,
+  updatedAt: product.updatedAt || product.createdAt
+});
+
 // Helper to transform backend category to frontend format
-const transformCategory = (category: Category): Category => {
-  if (!category) return {} as Category;
-  
-  return {
-    id: category._id,
-    _id: category._id,
-    name: category.name,
-    createdAt: category.createdAt,
-  };
-};
+const transformCategory = (category: any): Category => ({
+  id: category._id,
+  _id: category._id,
+  name: category.name,
+  image: category.image,
+  createdAt: category.createdAt,
+  updatedAt: category.updatedAt || category.createdAt
+});
 
 export const authService = {
   register: async (userData: { name: string; email: string; password: string }): Promise<AuthResponse> => {
@@ -141,14 +139,22 @@ export const categoryService = {
     return transformCategory(response.data);
   },
   
-  create: async (data: { name: string }): Promise<AxiosResponse<Category>> => {
-    const response = await api.post<Category>('/categories', data);
+  create: async (formData: FormData): Promise<AxiosResponse<Category>> => {
+    const response = await api.post<Category>('/categories', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     response.data = transformCategory(response.data);
     return response;
   },
   
-  update: async (id: string, data: { name: string }): Promise<AxiosResponse<Category>> => {
-    const response = await api.put<Category>(`/categories/${id}`, data);
+  update: async (id: string, formData: FormData): Promise<AxiosResponse<Category>> => {
+    const response = await api.put<Category>(`/categories/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     response.data = transformCategory(response.data);
     return response;
   },

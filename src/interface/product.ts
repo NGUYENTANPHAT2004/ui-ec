@@ -2,7 +2,6 @@
 
 export interface Product {
   _id: string;
-  id?: string; // Added for frontend compatibility
   name: string;
   description: string;
   price: number;
@@ -12,6 +11,10 @@ export interface Product {
   countInStock: number;
   rating: number;
   numReviews: number;
+  discount?: number;
+  originalPrice?: number;
+  ratingCount?: number;
+  tags?: string[];
   createdAt: string;
   updatedAt: string;
   discount?: number;
@@ -22,8 +25,8 @@ export interface Product {
 
 export interface Category {
   _id: string;
-  id?: string; // Added for frontend compatibility
   name: string;
+  image?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,7 +35,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'user' | 'admin';
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +47,7 @@ export interface AuthResponse {
 
 export interface ErrorResponse {
   error: string;
+  message?: string;
 }
 
 // Cart related interfaces
